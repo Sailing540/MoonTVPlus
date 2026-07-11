@@ -83,6 +83,11 @@ export async function POST(request: NextRequest) {
       OIDCClientSecret,
       OIDCButtonText,
       OIDCMinTrustLevel,
+      AnalyticsEnabled,
+      AnalyticsProvider,
+      AnalyticsScriptUrl,
+      AnalyticsWebsiteId,
+      AnalyticsCustomScript,
     } = body as {
       SiteName: string;
       Announcement: string;
@@ -138,6 +143,11 @@ export async function POST(request: NextRequest) {
       OIDCClientSecret?: string;
       OIDCButtonText?: string;
       OIDCMinTrustLevel?: number;
+      AnalyticsEnabled?: boolean;
+      AnalyticsProvider?: 'umami' | 'google' | 'clarity' | 'custom';
+      AnalyticsScriptUrl?: string;
+      AnalyticsWebsiteId?: string;
+      AnalyticsCustomScript?: string;
     };
 
     // 参数校验
@@ -224,7 +234,16 @@ export async function POST(request: NextRequest) {
       (OIDCClientSecret !== undefined &&
         typeof OIDCClientSecret !== 'string') ||
       (OIDCButtonText !== undefined && typeof OIDCButtonText !== 'string') ||
-      (OIDCMinTrustLevel !== undefined && typeof OIDCMinTrustLevel !== 'number')
+      (OIDCMinTrustLevel !== undefined && typeof OIDCMinTrustLevel !== 'number') ||
+      (AnalyticsEnabled !== undefined && typeof AnalyticsEnabled !== 'boolean') ||
+      (AnalyticsProvider !== undefined &&
+        AnalyticsProvider !== 'umami' &&
+        AnalyticsProvider !== 'google' &&
+        AnalyticsProvider !== 'clarity' &&
+        AnalyticsProvider !== 'custom') ||
+      (AnalyticsScriptUrl !== undefined && typeof AnalyticsScriptUrl !== 'string') ||
+      (AnalyticsWebsiteId !== undefined && typeof AnalyticsWebsiteId !== 'string') ||
+      (AnalyticsCustomScript !== undefined && typeof AnalyticsCustomScript !== 'string')
     ) {
       return NextResponse.json({ error: '参数格式错误' }, { status: 400 });
     }
@@ -295,6 +314,11 @@ export async function POST(request: NextRequest) {
       OIDCClientSecret,
       OIDCButtonText,
       OIDCMinTrustLevel,
+      AnalyticsEnabled,
+      AnalyticsProvider,
+      AnalyticsScriptUrl,
+      AnalyticsWebsiteId,
+      AnalyticsCustomScript,
     };
 
     // 写入数据库

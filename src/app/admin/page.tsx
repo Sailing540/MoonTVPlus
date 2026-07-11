@@ -24,6 +24,7 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   AlertCircle,
   AlertTriangle,
+  BarChart3,
   BookMarked,
   BookOpen,
   Bot,
@@ -406,6 +407,11 @@ interface SiteConfig {
   OIDCClientId?: string;
   OIDCClientSecret?: string;
   OIDCButtonText?: string;
+  AnalyticsEnabled?: boolean;
+  AnalyticsProvider?: 'umami' | 'google' | 'clarity' | 'custom';
+  AnalyticsScriptUrl?: string;
+  AnalyticsWebsiteId?: string;
+  AnalyticsCustomScript?: string;
 }
 
 // 视频源数据类型
@@ -10198,6 +10204,11 @@ const SiteConfigComponent = ({
     OIDCClientId: '',
     OIDCClientSecret: '',
     OIDCButtonText: '',
+    AnalyticsEnabled: false,
+    AnalyticsProvider: 'umami',
+    AnalyticsScriptUrl: '',
+    AnalyticsWebsiteId: '',
+    AnalyticsCustomScript: '',
   });
 
   // 豆瓣数据源相关状态
@@ -11525,6 +11536,194 @@ const SiteConfigComponent = ({
               开启后将显示豆瓣评论与相似推荐。评论为逆向抓取，请自行承担责任。
             </p>
           </div>
+        </div>
+      </details>
+
+      {/* 流量统计配置 */}
+      <details className='group rounded-lg border border-gray-200 p-4 dark:border-gray-700'>
+        <summary className='flex cursor-pointer items-center justify-between font-medium text-gray-900 dark:text-gray-100'>
+          <span className='flex items-center gap-2'>
+            <BarChart3 className='h-5 w-5' />
+            流量统计
+          </span>
+          <ChevronDown className='h-5 w-5 transition-transform group-open:rotate-180' />
+        </summary>
+        <div className='mt-4 space-y-4'>
+          {/* 启用开关 */}
+          <div className='flex items-center justify-between'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                启用流量统计
+              </label>
+              <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                开启后将在页面中注入统计脚本，支持 Umami、Google Analytics 和自定义代码
+              </p>
+            </div>
+            <button
+              type='button'
+              onClick={() =>
+                setSiteSettings((prev) => ({
+                  ...prev,
+                  AnalyticsEnabled: !prev.AnalyticsEnabled,
+                }))
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+                siteSettings.AnalyticsEnabled
+                  ? buttonStyles.toggleOn
+                  : buttonStyles.toggleOff
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full ${
+                  buttonStyles.toggleThumb
+                } transition-transform ${
+                  siteSettings.AnalyticsEnabled
+                    ? buttonStyles.toggleThumbOn
+                    : buttonStyles.toggleThumbOff
+                }`}
+              />
+            </button>
+          </div>
+
+          {siteSettings.AnalyticsEnabled && (
+            <>
+              {/* 统计服务提供商 */}
+              <div>
+                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                  统计服务
+                </label>
+                <select
+                  value={siteSettings.AnalyticsProvider}
+                  onChange={(e) =>
+                    setSiteSettings((prev) => ({
+                      ...prev,
+                      AnalyticsProvider: e.target.value as 'umami' | 'google' | 'clarity' | 'custom',
+                    }))
+                  }
+                  className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                >
+                  <option value='umami'>Umami（开源，自托管）</option>
+                  <option value='google'>Google Analytics</option>
+                  <option value='clarity'>Microsoft Clarity（免费，热力图+会话回放）</option>
+                  <option value='custom'>自定义代码</option>
+                </select>
+              </div>
+
+              {siteSettings.AnalyticsProvider === 'umami' && (
+                <>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                      Umami 脚本地址
+                    </label>
+                    <input
+                      type='text'
+                      value={siteSettings.AnalyticsScriptUrl}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({
+                          ...prev,
+                          AnalyticsScriptUrl: e.target.value,
+                        }))
+                      }
+                      placeholder='https://your-umami-server.com/script.js'
+                      className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                    />
+                    <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                      Umami 实例的 script.js 完整 URL
+                    </p>
+                  </div>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                      网站 ID (Website ID)
+                    </label>
+                    <input
+                      type='text'
+                      value={siteSettings.AnalyticsWebsiteId}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({
+                          ...prev,
+                          AnalyticsWebsiteId: e.target.value,
+                        }))
+                      }
+                      placeholder='e.g. 12345678-abcd-efgh-ijkl-1234567890ab'
+                      className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                    />
+                    <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                      在 Umami 后台添加网站后获取的 Website ID
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {siteSettings.AnalyticsProvider === 'google' && (
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                    Measurement ID
+                  </label>
+                  <input
+                    type='text'
+                    value={siteSettings.AnalyticsWebsiteId}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        AnalyticsWebsiteId: e.target.value,
+                      }))
+                    }
+                    placeholder='G-XXXXXXXXXX'
+                    className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                  />
+                  <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                    Google Analytics 4 的 Measurement ID，在 GA 后台「数据流」中获取
+                  </p>
+                </div>
+              )}
+
+              {siteSettings.AnalyticsProvider === 'clarity' && (
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                    Project ID
+                  </label>
+                  <input
+                    type='text'
+                    value={siteSettings.AnalyticsWebsiteId}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        AnalyticsWebsiteId: e.target.value,
+                      }))
+                    }
+                    placeholder='e.g. abc1234567'
+                    className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                  />
+                  <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                    Microsoft Clarity 的 Project ID，在 clarity.microsoft.com 项目设置中获取
+                  </p>
+                </div>
+              )}
+
+              {siteSettings.AnalyticsProvider === 'custom' && (
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                    自定义统计代码
+                  </label>
+                  <textarea
+                    value={siteSettings.AnalyticsCustomScript}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({
+                        ...prev,
+                        AnalyticsCustomScript: e.target.value,
+                      }))
+                    }
+                    placeholder='粘贴完整的统计脚本代码，如百度统计、Plausible、51la 等...'
+                    rows={6}
+                    className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+                  />
+                  <p className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
+                    支持任意第三方统计服务的脚本代码，将直接注入到页面 &lt;head&gt; 中
+                  </p>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </details>
 

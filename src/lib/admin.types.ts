@@ -73,6 +73,12 @@ export interface AdminConfig {
     OIDCClientSecret?: string; // OIDC Client Secret
     OIDCButtonText?: string; // OIDC登录按钮文字
     OIDCMinTrustLevel?: number; // 最低信任等级（仅LinuxDo网站有效，为0时不判断）
+    // 流量统计配置
+    AnalyticsEnabled?: boolean; // 是否启用流量统计
+    AnalyticsProvider?: 'umami' | 'google' | 'clarity' | 'custom'; // 统计服务提供商
+    AnalyticsScriptUrl?: string; // 脚本URL（Umami: umami.js地址; GA: gtag URL; 自定义: 脚本src）
+    AnalyticsWebsiteId?: string; // 网站ID（Umami: website_id; GA: Measurement ID如G-XXXX; 自定义: 留空）
+    AnalyticsCustomScript?: string; // 自定义统计代码（仅custom模式使用，完整的HTML脚本内容）
   };
   UserConfig: {
     Users: {

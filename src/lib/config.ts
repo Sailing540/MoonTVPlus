@@ -328,6 +328,12 @@ async function getInitConfig(
       TurnstileSiteKey: '',
       TurnstileSecretKey: '',
       DefaultUserTags: [],
+      // 流量统计配置
+      AnalyticsEnabled: false,
+      AnalyticsProvider: 'umami',
+      AnalyticsScriptUrl: '',
+      AnalyticsWebsiteId: '',
+      AnalyticsCustomScript: '',
     },
     UserConfig: {
       Users: [],
@@ -587,6 +593,22 @@ export function configSelfCheck(adminConfig: AdminConfig): AdminConfig {
   }
   if (adminConfig.SiteConfig.DefaultUserTags === undefined) {
     adminConfig.SiteConfig.DefaultUserTags = [];
+  }
+  // 流量统计配置补全
+  if (adminConfig.SiteConfig.AnalyticsEnabled === undefined) {
+    adminConfig.SiteConfig.AnalyticsEnabled = false;
+  }
+  if (adminConfig.SiteConfig.AnalyticsProvider === undefined) {
+    adminConfig.SiteConfig.AnalyticsProvider = 'umami';
+  }
+  if (adminConfig.SiteConfig.AnalyticsScriptUrl === undefined) {
+    adminConfig.SiteConfig.AnalyticsScriptUrl = '';
+  }
+  if (adminConfig.SiteConfig.AnalyticsWebsiteId === undefined) {
+    adminConfig.SiteConfig.AnalyticsWebsiteId = '';
+  }
+  if (adminConfig.SiteConfig.AnalyticsCustomScript === undefined) {
+    adminConfig.SiteConfig.AnalyticsCustomScript = '';
   }
   if (!adminConfig.TelegramConfig) {
     adminConfig.TelegramConfig = {
