@@ -91,3 +91,17 @@ pnpm deploy:cloudflare
 
 1. GitHub: **Actions** 标签查看工作流运行状态
 2. Cloudflare: [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers/overview) 查看部署记录
+
+## 6. 版本校验与升级记录
+
+本仓库已按上游 `Sailing540/MoonTVPlus` 的最新 `main` 分支校验到 `224.0.0` 版本（见 `VERSION.txt`），该版本包含 Turso/libSQL 支持、流量分析、客户端去广告配置等更新。
+
+如果后续需要继续升级 Cloudflare Workers 部署，请先同步上游代码，再重新执行：
+
+```bash
+pnpm install
+pnpm build:cloudflare
+pnpm deploy:cloudflare
+```
+
+升级后建议在 Cloudflare Dashboard 检查 Worker 日志，并确认 D1/Upstash/Turso 等存储环境变量与当前 `wrangler.toml`、GitHub Secrets 保持一致。
